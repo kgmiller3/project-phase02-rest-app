@@ -1,10 +1,5 @@
 //CustomerList.js
-import React, {useState} from 'react';
-import { useEffect } from 'react';
-import { getAll, post, put, deleteById } from '../memdb.js';    
-
-
-function log(message){console.log(message);}
+import React from 'react'; 
  
 function CustomerAddUpdateForm(props) {
   

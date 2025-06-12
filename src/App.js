@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import { getAll, post, put, deleteById } from './memdb.js'
+import { getAll, deleteById, post, put} from './restdb.js'
 import './App.css';
 import CustomerList from './components/CustomerList.js';
 import CustomerAddUpdateForm from './components/CustomerAddUpdateForm.js';
@@ -10,16 +10,16 @@ export function App(params) {
      let blankCustomer = { "id": -1, "name": "", "email": "", "password": "" };
      const [customers, setCustomers] = useState([]);
      const [formObject, setFormObject] = useState(blankCustomer);
-     let mode = (formObject.id >= 0) ? 'Update' : 'Add';
+     let mode = (formObject.id !== -1) ? 'Update' : 'Add';
    
      useEffect(() => {
        log("in useEffect()");
        getCustomers();
-     }, []);
+     }, [formObject]);
    
      const getCustomers =  function(){
        log("in getCustomers()");
-       setCustomers(getAll());
+       getAll(setCustomers);
      }
    
      const handleListClick = function(item){
@@ -46,27 +46,33 @@ export function App(params) {
    
      let onDeleteClick = function () {
        log("in onDeleteClick()");
-       if (formObject.id >= 0) {
-         deleteById(formObject.id);
-         setFormObject(blankCustomer);
+       let postOpCallback = () => {setFormObject(blankCustomer);}
+       if (formObject.id !== -1) {
+         deleteById(formObject.id,postOpCallback);
        } else {
          alert("Nothing to delete");
+         setFormObject(blankCustomer);
        }
      }
    
      let onSaveClick = function () {
        log("in onSaveClick()");
+        if (formObject.name === "" || formObject.email === "" || formObject.password === "") {
+          alert("Please fill in all fields");
+          return;
+        }
+        let postOpCallback = () => {setFormObject(blankCustomer);}
        if (mode === 'Add') {
-         post(formObject);
+         post(formObject, postOpCallback);
        }
        if (mode === 'Update') {
-         put(formObject.id, formObject);
+         put(formObject, postOpCallback);
        }
-       setFormObject(blankCustomer);
+       //setFormObject(blankCustomer);
      
      }
 
-      let updatearams = {
+      let updateparams = {
         handleInputChange: handleInputChange,
         onSaveClick: onSaveClick,
         onDeleteClick: onDeleteClick,
@@ -82,7 +88,7 @@ export function App(params) {
       formObject={formObject}
       handleListClick={handleListClick} />
       <CustomerAddUpdateForm 
-      {...updatearams}/>
+      {...updateparams}/>
     </div>
   );
 }

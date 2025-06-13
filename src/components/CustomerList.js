@@ -24,7 +24,7 @@ return (
                 >
                   <td>{item.name}</td>
                   <td>{item.email}</td>
-                  <td>{item.password}</td>
+                  <td><input type="password" value={item.password}/></td>
                 </tr>);
               }
             )}
